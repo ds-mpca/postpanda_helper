@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>postpanda_helper &mdash; PostPanda Helper v0.1.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> PostPanda Helper
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">postpanda_helper</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PostPanda Helper</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>postpanda_helper</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for postpanda_helper</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">MutableMapping</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">psycopg2.extensions</span> <span class="kn">import</span> <span class="n">AsIs</span><span class="p">,</span> <span class="n">adapt</span><span class="p">,</span> <span class="n">register_adapter</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.dialects.postgresql</span> <span class="kn">import</span> <span class="n">DATERANGE</span><span class="p">,</span> <span class="n">NUMRANGE</span><span class="p">,</span> <span class="n">TSRANGE</span><span class="p">,</span> <span class="n">TSTZRANGE</span>
+
+<span class="kn">from</span> <span class="nn">.geo_helpers</span> <span class="kn">import</span> <span class="n">HAS_GEO_EXTENSIONS</span>
+<span class="kn">from</span> <span class="nn">.pd_helpers</span> <span class="kn">import</span> <span class="n">is_date_interval</span><span class="p">,</span> <span class="n">interval_to_range</span>
+<span class="kn">from</span> <span class="nn">.psql_helpers</span> <span class="kn">import</span> <span class="n">PandaCSVtoSQL</span>
+<span class="kn">from</span> <span class="nn">.select_sert</span> <span class="kn">import</span> <span class="n">SelectSert</span>
+
+<span class="k">if</span> <span class="n">HAS_GEO_EXTENSIONS</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.geo_helpers</span> <span class="kn">import</span> <span class="n">get_geometry_type</span><span class="p">,</span> <span class="n">geometry_to_ewkb</span>
+
+    <span class="c1"># noinspection PyPackageRequirements</span>
+    <span class="kn">from</span> <span class="nn">geopandas.array</span> <span class="kn">import</span> <span class="n">GeometryDtype</span>
+
+    <span class="c1"># noinspection PyPackageRequirements</span>
+    <span class="kn">from</span> <span class="nn">geopandas</span> <span class="kn">import</span> <span class="n">GeoSeries</span>
+
+    <span class="c1"># noinspection PyPackageRequirements</span>
+    <span class="kn">from</span> <span class="nn">geoalchemy2.types</span> <span class="kn">import</span> <span class="n">Geometry</span>
+
+<span class="n">register_adapter</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">NA</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">adapt</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+<span class="n">register_adapter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">AsIs</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">register_adapter</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Interval</span><span class="p">,</span> <span class="n">interval_to_range</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="pd_to_sql"><a class="viewcode-back" href="../postpanda_helper.html#postpanda_helper.pd_to_sql">[docs]</a><span class="k">def</span> <span class="nf">pd_to_sql</span><span class="p">(</span>
+    <span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">con</span><span class="p">,</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">if_exists</span><span class="o">=</span><span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">index_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">chunksize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    With support for daterange and tsrange</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtm</span> <span class="o">=</span> <span class="n">dtype</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">copied</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">dtype</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_interval_dtype</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]):</span>
+            <span class="n">ex</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">][</span><span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">first_valid_index</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">is_date_interval</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+                    <span class="n">dtm</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">DATERANGE</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="s2">&quot;tz&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ex</span><span class="o">.</span><span class="n">tz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">dtm</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">TSTZRANGE</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dtm</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">TSRANGE</span>
+            <span class="k">elif</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_number</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">left</span><span class="p">):</span>
+                <span class="n">dtm</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">NUMRANGE</span>
+        <span class="k">elif</span> <span class="n">HAS_GEO_EXTENSIONS</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">GeometryDtype</span><span class="p">):</span>
+            <span class="c1"># copy because we&#39;re going to mess with the column</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">copied</span><span class="p">:</span>
+                <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">GeoSeries</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">geometry_type</span><span class="p">,</span> <span class="n">has_curve</span> <span class="o">=</span> <span class="n">get_geometry_type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">srid</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">(</span><span class="n">min_confidence</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">dtm</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">Geometry</span><span class="p">(</span><span class="n">geometry_type</span><span class="o">=</span><span class="n">geometry_type</span><span class="p">,</span> <span class="n">srid</span><span class="o">=</span><span class="n">srid</span><span class="p">)</span>
+            <span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">geometry_to_ewkb</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">srid</span><span class="p">)</span>
+
+    <span class="n">dtm</span> <span class="o">=</span> <span class="n">dtm</span> <span class="ow">or</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">con</span><span class="o">=</span><span class="n">con</span><span class="p">,</span>
+        <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span>
+        <span class="n">if_exists</span><span class="o">=</span><span class="n">if_exists</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">index_label</span><span class="o">=</span><span class="n">index_label</span><span class="p">,</span>
+        <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">dtm</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PandaCSVtoSQL&quot;</span><span class="p">,</span> <span class="s2">&quot;SelectSert&quot;</span><span class="p">,</span> <span class="s2">&quot;pd_to_sql&quot;</span><span class="p">]</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Daniel Sullivan.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
