@@ -88,7 +88,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">postpanda_helper package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-postpanda_helper.geo_helpers">postpanda_helper.geo_helpers module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#postpanda-helper-normalizer-spec-module">postpanda_helper.normalizer_spec module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-postpanda_helper.normalizer">postpanda_helper.normalizer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-postpanda_helper.pandas_reader">postpanda_helper.pandas_reader module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-postpanda_helper.pandas_writer">postpanda_helper.pandas_writer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-postpanda_helper.pd_helpers">postpanda_helper.pd_helpers module</a></li>
@@ -176,8 +176,142 @@
 <div class="section" id="module-postpanda_helper.geo_helpers">
 <span id="postpanda-helper-geo-helpers-module"></span><h2>postpanda_helper.geo_helpers module<a class="headerlink" href="#module-postpanda_helper.geo_helpers" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="postpanda-helper-normalizer-spec-module">
-<h2>postpanda_helper.normalizer_spec module<a class="headerlink" href="#postpanda-helper-normalizer-spec-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-postpanda_helper.normalizer">
+<span id="postpanda-helper-normalizer-module"></span><h2>postpanda_helper.normalizer module<a class="headerlink" href="#module-postpanda_helper.normalizer" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.handle_exec">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">handle_exec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#handle_exec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.handle_exec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.load_spec">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">load_spec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#load_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.load_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.normalizer">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">normalizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substituter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#postpanda_helper.select_sert.SelectSert" title="postpanda_helper.select_sert.SelectSert"><span class="pre">postpanda_helper.select_sert.SelectSert</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#normalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.normalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes dataframe based on a YAML spec file</p>
+<p>Modifies dataframe inplace</p>
+<p><strong>YAML Example:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span>       <span class="l l-Scalar l-Scalar-Plain">replace_id</span>
+  <span class="nt">columns</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datasource_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">units</span>
+  <span class="nt">delete_old</span><span class="p">:</span>   <span class="l l-Scalar l-Scalar-Plain">false</span>
+  <span class="nt">new_col_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">unit_id</span>
+  <span class="nt">sql_column_names</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datasource_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+  <span class="nt">table_name</span><span class="p">:</span>   <span class="l l-Scalar l-Scalar-Plain">units</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span>           <span class="l l-Scalar l-Scalar-Plain">replace_id</span>
+  <span class="nt">columns</span><span class="p">:</span>          <span class="l l-Scalar l-Scalar-Plain">f</span>
+  <span class="nt">delete_old</span><span class="p">:</span>       <span class="l l-Scalar l-Scalar-Plain">false</span>
+  <span class="nt">new_col_name</span><span class="p">:</span>     <span class="l l-Scalar l-Scalar-Plain">frequency_id</span>
+  <span class="nt">sql_column_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+  <span class="nt">table_name</span><span class="p">:</span>       <span class="l l-Scalar l-Scalar-Plain">frequency</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">apply_funcs</span>
+  <span class="nt">to_exec</span><span class="p">:</span>
+    <span class="nt">keys</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">functions</span>
+    <span class="c1"># language=Python</span>
+    <span class="nt">code</span><span class="p">:</span> <span class="p p-Indicator">|</span>
+           <span class="no">from functools import partial</span>
+           <span class="no">import pandas as pd</span>
+           <span class="no">from postpanda_helper.pd_helpers import to_date</span>
+
+
+           <span class="no">def col_to_pt(s: pd.Series):</span>
+               <span class="no">import geopandas as gpd</span>
+
+               <span class="no">latlon = s.str.split(&quot;,&quot;, expand=True)</span>
+               <span class="no">out = gpd.GeoSeries(gpd.points_from_xy(latlon[1], latlon[0], crs=&quot;WGS84&quot;))</span>
+               <span class="no">out[s.isna()] = None</span>
+               <span class="no">return out</span>
+
+
+           <span class="no">functions = {</span>
+               <span class="no">None: [</span>
+                   <span class="no">partial(to_date, freq_col=&quot;f&quot;, date_col=&quot;end&quot;, start_or_end=&quot;end&quot;),</span>
+                   <span class="no">partial(to_date, freq_col=&quot;f&quot;, date_col=&quot;start&quot;, start_or_end=&quot;start&quot;),</span>
+               <span class="no">],</span>
+               <span class="no">&quot;last_updated&quot;: lambda x: pd.to_datetime(x, utc=True),</span>
+               <span class="no">&quot;latlon&quot;: col_to_pt,</span>
+               <span class="no">&quot;latlon2&quot;: col_to_pt,</span>
+           <span class="no">}</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">drop_cols</span>
+  <span class="nt">to_drop</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">units</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">iso3166</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">unitsshort</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lon</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lat</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lon2</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lat2</span>
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">drop_na_cols</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rename_cols</span>
+  <span class="nt">name_map</span><span class="p">:</span>
+    <span class="nt">end</span><span class="p">:</span>   <span class="l l-Scalar l-Scalar-Plain">end_date</span>
+    <span class="nt">start</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">start_date</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span>      <span class="l l-Scalar l-Scalar-Plain">extra_to_json</span>
+  <span class="nt">excluded</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">series_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">description</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">start_date</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">end_date</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">last_updated</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">geoset_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">data</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datasource_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">frequency_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">source_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">unit_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">geography_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">geography2_id</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">latlon</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">latlon2</span>
+  <span class="nt">json_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">extra_data</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">action</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">many_to_many</span>
+  <span class="nt">columns</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">tag</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">geography_id</span>
+  <span class="nt">table</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">x_data_points_geography</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> – frame to modify</p></li>
+<li><p><strong>spec_file</strong> – path to YAML file</p></li>
+<li><p><strong>substituter</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.walk">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">walk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#walk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.walk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.walk_dict">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">walk_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#walk_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.walk_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="postpanda_helper.normalizer.walk_list">
+<code class="sig-prename descclassname"><span class="pre">postpanda_helper.normalizer.</span></code><code class="sig-name descname"><span class="pre">walk_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/postpanda_helper/normalizer.html#walk_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#postpanda_helper.normalizer.walk_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-postpanda_helper.pandas_reader">
 <span id="postpanda-helper-pandas-reader-module"></span><h2>postpanda_helper.pandas_reader module<a class="headerlink" href="#module-postpanda_helper.pandas_reader" title="Permalink to this headline">¶</a></h2>
