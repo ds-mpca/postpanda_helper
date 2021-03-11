@@ -134,8 +134,6 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../postpanda_helper.html">postpanda_helper</a> &raquo;</li>
-        
       <li>postpanda_helper.select_sert</li>
     
     
@@ -166,7 +164,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">pd_helpers</span> <span class="k">as</span> <span class="n">pdh</span>
 <span class="kn">from</span> <span class="nn">.geo_helpers</span> <span class="kn">import</span> <span class="n">df_to_shape</span>
 <span class="kn">from</span> <span class="nn">.pd_helpers</span> <span class="kn">import</span> <span class="n">get_common_initial_str</span><span class="p">,</span> <span class="n">convert_df_dates_to_timestamps</span>
-<span class="kn">from</span> <span class="nn">.psql_helpers</span> <span class="kn">import</span> <span class="n">possible_upsert</span><span class="p">,</span> <span class="n">disable_reflection_warning</span>
+<span class="kn">from</span> <span class="nn">.psql_helpers</span> <span class="kn">import</span> <span class="n">possible_upsert</span><span class="p">,</span> <span class="n">disable_reflection_warning</span><span class="p">,</span> <span class="n">pd_to_sql</span>
 
 
 <div class="viewcode-block" id="SelectSert"><a class="viewcode-back" href="../../postpanda_helper.html#postpanda_helper.select_sert.SelectSert">[docs]</a><span class="k">class</span> <span class="nc">SelectSert</span><span class="p">:</span>
@@ -245,7 +243,6 @@
         <span class="k">return</span> <span class="n">frame</span>
 
     <span class="k">def</span> <span class="nf">_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">pd_to_sql</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -309,7 +306,8 @@
         <span class="n">sql_tups</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">test_sql</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># noinspection PyTypeChecker</span>
         <span class="n">df_tups</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">test_frame</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">sql_ids</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span><span class="p">))</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">to_remove</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">v</span> <span class="ow">in</span> <span class="n">sql_tups</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">df_tups</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">df_tups</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="c1"># to_remove = pd.Series([v in sql_tups.to_list() for v in df_tups], index=df_tups.index)</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="n">df_tups</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">sql_tups</span><span class="p">)</span>
         <span class="n">to_insert</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="o">~</span><span class="n">to_remove</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">to_insert</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sql_ids</span>
@@ -424,6 +422,8 @@
         <span class="p">)</span>
         <span class="n">sql_types</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">sql_id_name</span><span class="p">]]</span><span class="o">.</span><span class="n">dtypes</span>
 
+        <span class="n">frame_cols</span> <span class="o">=</span> <span class="n">convert_df_dates_to_timestamps</span><span class="p">(</span><span class="n">frame_cols</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">convert_df_dates_to_timestamps</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">left</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span>
             <span class="n">frame_cols</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
                 <span class="n">sql_types</span><span class="p">[</span><span class="n">sql_types</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">frame_cols</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
@@ -431,8 +431,6 @@
         <span class="p">)</span>
         <span class="n">idx_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unset_index</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">left</span><span class="p">)</span>
         <span class="n">right</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-        <span class="n">convert_df_dates_to_timestamps</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
-        <span class="n">convert_df_dates_to_timestamps</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">case_insensitive</span><span class="p">:</span>
             <span class="n">left</span><span class="p">[</span><span class="n">sql_column_names</span> <span class="ow">or</span> <span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">to_lower</span><span class="p">(</span><span class="n">left</span><span class="p">[</span><span class="n">sql_column_names</span> <span class="ow">or</span> <span class="n">columns</span><span class="p">])</span>
             <span class="n">right</span><span class="p">[</span><span class="n">sql_column_names</span> <span class="ow">or</span> <span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">pdh</span><span class="o">.</span><span class="n">to_lower</span><span class="p">(</span><span class="n">right</span><span class="p">[</span><span class="n">sql_column_names</span> <span class="ow">or</span> <span class="n">columns</span><span class="p">])</span>
